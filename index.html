@@ -42,6 +42,8 @@
   <link href="assets/css/style.css" rel="stylesheet">
 </head>
 
+<body>
+
 <!-- ======= Header & Top Navbar ======= -->
 <header id="header" class="d-flex align-items-center">
   <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
@@ -58,29 +60,56 @@
     </a>
 
     <nav id="navbar" class="navbar">
+      <div class="mobile-nav-header d-xl-none">
+        <span class="mobile-nav-title">Menu Navigation</span>
+        <button type="button" class="mobile-nav-close" aria-label="Close navigation menu">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
       <ul>
-        <li><a href="#hero" class="nav-link scrollto active"><i class="bx bx-home d-md-none me-2"></i>Home</a></li>
-        <li><a href="#about" class="nav-link scrollto"><i class="bx bx-user d-md-none me-2"></i>About</a></li>
-        <li><a href="#skills" class="nav-link scrollto"><i class="bx bx-code-alt d-md-none me-2"></i>Tech Stack</a></li>
-        <li><a href="#achievements" class="nav-link scrollto"><i
-              class="bx bx-trophy d-md-none me-2"></i>Achievements</a></li>
-        <li><a href="#education" class="nav-link scrollto"><i class="bx bx-book-open d-md-none me-2"></i>Education</a>
+        <li><a href="#hero" class="nav-link scrollto active"><i class="bx bx-home nav-icon"></i><span>Home</span></a></li>
+        <li><a href="#about" class="nav-link scrollto"><i class="bx bx-user nav-icon"></i><span>About</span></a></li>
+        <li><a href="#skills" class="nav-link scrollto"><i class="bx bx-code-alt nav-icon"></i><span>Tech Stack</span></a></li>
+        <li><a href="#achievements" class="nav-link scrollto"><i class="bx bx-trophy nav-icon"></i><span>Achievements</span></a></li>
+        <li><a href="#education" class="nav-link scrollto"><i class="bx bx-book-open nav-icon"></i><span>Education</span></a></li>
+        <li><a href="#portfolio" class="nav-link scrollto"><i class="bx bx-layer nav-icon"></i><span>Projects</span></a></li>
+        <li><a href="#testimonials" class="nav-link scrollto"><i class="bx bx-chat nav-icon"></i><span>Testimonials</span></a></li>
+        <li><a href="#contact" class="nav-link scrollto"><i class="bx bx-envelope nav-icon"></i><span>Contact</span></a></li>
+        
+        <!-- Mobile Drawer Extras -->
+        <li class="mobile-drawer-footer d-xl-none">
+          <button type="button" class="btn-top-resume btn-trigger-resume w-100 justify-content-center mb-3" data-bs-toggle="modal" data-bs-target="#resumeModal">
+            <i class="bx bx-download"></i> View &amp; Download CV
+          </button>
+          <div class="mobile-social-links d-flex align-items-center justify-content-center gap-3">
+            <a href="https://github.com/Snehalmajhi20" target="_blank" rel="noopener noreferrer" class="nav-social-btn" title="GitHub"><i class="bx bxl-github"></i></a>
+            <a href="https://www.linkedin.com/in/snehalmajhi20-java-developer" target="_blank" rel="noopener noreferrer" class="nav-social-btn" title="LinkedIn"><i class="bx bxl-linkedin"></i></a>
+            <a href="mailto:snehalmajhi20@gmail.com" class="nav-social-btn" title="Email"><i class="bx bx-envelope"></i></a>
+          </div>
         </li>
-        <li><a href="#portfolio" class="nav-link scrollto"><i class="bx bx-layer d-md-none me-2"></i>Projects</a></li>
-        <li><a href="#testimonials" class="nav-link scrollto"><i class="bx bx-chat d-md-none me-2"></i>Testimonials</a>
-        </li>
-        <li><a href="#contact" class="nav-link scrollto"><i class="bx bx-envelope d-md-none me-2"></i>Contact</a></li>
       </ul>
-      <i class="bi bi-list mobile-nav-toggle"></i>
+      <div class="mobile-nav-backdrop d-xl-none"></div>
     </nav>
 
-    <div class="nav-actions d-none d-lg-flex align-items-center gap-2">
+    <!-- Desktop Header Actions (Screens >= 1200px) -->
+    <div class="nav-actions d-none d-xl-flex align-items-center gap-2">
       <a href="https://github.com/Snehalmajhi20" target="_blank" rel="noopener noreferrer" class="nav-social-btn"
         title="GitHub"><i class="bx bxl-github"></i></a>
       <a href="https://www.linkedin.com/in/snehalmajhi20-java-developer" target="_blank" rel="noopener noreferrer"
         class="nav-social-btn" title="LinkedIn"><i class="bx bxl-linkedin"></i></a>
-      <button type="button" class="btn-top-resume" data-bs-toggle="modal" data-bs-target="#resumeModal">
+      <button type="button" class="btn-top-resume btn-trigger-resume" data-bs-toggle="modal" data-bs-target="#resumeModal">
         <i class="bx bx-download"></i> CV
+      </button>
+    </div>
+
+    <!-- Mobile & Tablet Header Actions (Screens < 1200px) -->
+    <div class="nav-actions-mobile d-flex d-xl-none align-items-center gap-2">
+      <button type="button" class="btn-top-resume btn-trigger-resume btn-resume-sm" data-bs-toggle="modal" data-bs-target="#resumeModal" title="View Resume">
+        <i class="bx bx-file"></i> CV
+      </button>
+      <button type="button" class="mobile-nav-toggle" aria-label="Toggle navigation menu" id="mobileNavToggleBtn">
+        <i class="bi bi-list"></i>
       </button>
     </div>
 
@@ -138,7 +167,7 @@
         <div class="hero-actions">
           <a href="#portfolio" class="btn-primary-glow scrollto"><i class="bx bx-grid-alt"></i> Explore Projects</a>
           <a href="#contact" class="btn-outline-glow scrollto"><i class="bx bx-mail-send"></i> Let's Connect</a>
-          <button type="button" class="btn-outline-glow" data-bs-toggle="modal" data-bs-target="#resumeModal">
+          <button type="button" class="btn-outline-glow btn-trigger-resume" data-bs-toggle="modal" data-bs-target="#resumeModal">
             <i class="bx bx-file"></i> View Resume
           </button>
         </div>
@@ -1371,10 +1400,15 @@
           <strong>Higher Secondary (Science)</strong> - Rajdhani Higher Secondary School (2018 - 2020)
         </p>
       </div>
-      <div class="modal-footer border-secondary">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-info text-dark fw-bold" onclick="window.print()"><i
-            class="bx bx-printer"></i> Print / Save as PDF</button>
+      <div class="modal-footer border-secondary justify-content-between flex-wrap gap-2">
+        <a href="mailto:snehalmajhi20@gmail.com?subject=Snehal%20Majhi%20-%20Resume%20Request" class="btn btn-outline-info btn-sm">
+          <i class="bx bx-envelope"></i> Request Full PDF via Email
+        </a>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-info text-dark fw-bold btn-sm" onclick="window.print()"><i
+              class="bx bx-printer"></i> Print / Save as PDF</button>
+        </div>
       </div>
     </div>
   </div>

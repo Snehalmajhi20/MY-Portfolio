@@ -76,9 +76,9 @@
     if (!target) return;
     let header = select('#header');
     let offset = header ? header.offsetHeight : 70;
-    let elementPos = target.offsetTop;
+    let elementPos = target.getBoundingClientRect().top + window.pageYOffset;
     window.scrollTo({
-      top: elementPos - offset + 5,
+      top: elementPos - offset + 2,
       behavior: 'smooth'
     });
   };
@@ -108,35 +108,39 @@
   }
 
   /**
-   * Mobile nav toggle handling
+   * Mobile navigation drawer control
    */
-  on('click', '.mobile-nav-toggle', function(e) {
+  const openMobileNav = () => {
     let navbar = select('#navbar');
     if (navbar) {
-      navbar.classList.toggle('navbar-mobile');
-      this.classList.toggle('bi-list');
-      this.classList.toggle('bi-x');
+      navbar.classList.add('navbar-mobile');
+      document.body.classList.add('mobile-nav-active');
+    }
+  };
+
+  const closeMobileNav = () => {
+    let navbar = select('#navbar');
+    if (navbar && navbar.classList.contains('navbar-mobile')) {
+      navbar.classList.remove('navbar-mobile');
+      document.body.classList.remove('mobile-nav-active');
+    }
+  };
+
+  const toggleMobileNav = () => {
+    let navbar = select('#navbar');
+    if (navbar && navbar.classList.contains('navbar-mobile')) {
+      closeMobileNav();
+    } else {
+      openMobileNav();
+    }
+  };
+
+  // Close mobile nav automatically when resizing back to desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 1200) {
+      closeMobileNav();
     }
   });
-
-  /**
-   * Smooth scroll on links with .scrollto and auto-close mobile menu
-   */
-  on('click', '.scrollto', function(e) {
-    if (this.hash && select(this.hash)) {
-      e.preventDefault();
-      let navbar = select('#navbar');
-      if (navbar && navbar.classList.contains('navbar-mobile')) {
-        navbar.classList.remove('navbar-mobile');
-        let navbarToggle = select('.mobile-nav-toggle');
-        if (navbarToggle) {
-          navbarToggle.classList.toggle('bi-list');
-          navbarToggle.classList.toggle('bi-x');
-        }
-      }
-      scrollto(this.hash);
-    }
-  }, true);
 
   /**
    * Hero Typed.js Effect
@@ -414,47 +418,155 @@
     }
   };
 
-  on('click', '.btn-open-modal', function(e) {
-    e.preventDefault();
-    const projectId = this.getAttribute('data-project');
-    if (projectId) {
-      openProjectModal(projectId);
+  // Resume Modal Helper
+  const openResumeModal = () => {
+    const resumeModalEl = select('#resumeModal');
+    if (!resumeModalEl) return;
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modalInstance = bootstrap.Modal.getOrCreateInstance(resumeModalEl);
+      modalInstance.show();
+    } else {
+      resumeModalEl.classList.add('show');
+      resumeModalEl.style.display = 'block';
+      document.body.classList.add('modal-open');
     }
-  }, true);
+  };
 
-  if (modalCloseBtn) {
-    modalCloseBtn.addEventListener('click', closeProjectModal);
+  const closeResumeModal = () => {
+    const resumeModalEl = select('#resumeModal');
+    if (!resumeModalEl) return;
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      const modalInstance = bootstrap.Modal.getInstance(resumeModalEl);
+      if (modalInstance) modalInstance.hide();
+    } else {
+      resumeModalEl.classList.remove('show');
+      resumeModalEl.style.display = 'none';
+      document.body.classList.remove('modal-open');
+    }
+  };
+
+  /**
+   * Fallback Copy Function for older environments
+   */
+  function fallbackCopy(text, onSuccess) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      if (onSuccess) onSuccess();
+    } catch (err) {
+      console.warn('Fallback copy failed', err);
+    }
+    document.body.removeChild(textArea);
   }
-  if (modalBackdrop) {
-    modalBackdrop.addEventListener('click', closeProjectModal);
-  }
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
+
+  /**
+   * Global Event Delegation for Clicks
+   * Ensures all buttons work flawlessly across all screen ratios & dynamic elements
+   */
+  document.addEventListener('click', function(e) {
+    // 1. Mobile navigation toggle (hamburger)
+    const mobileToggle = e.target.closest('.mobile-nav-toggle');
+    if (mobileToggle) {
+      e.preventDefault();
+      toggleMobileNav();
+      return;
+    }
+
+    // 2. Mobile nav close button
+    const mobileClose = e.target.closest('.mobile-nav-close');
+    if (mobileClose) {
+      e.preventDefault();
+      closeMobileNav();
+      return;
+    }
+
+    // 3. Mobile nav backdrop click
+    if (e.target.classList.contains('mobile-nav-backdrop')) {
+      e.preventDefault();
+      closeMobileNav();
+      return;
+    }
+
+    // 4. Smooth scroll navigation links (.scrollto)
+    const scrollLink = e.target.closest('.scrollto');
+    if (scrollLink && scrollLink.hash && select(scrollLink.hash)) {
+      e.preventDefault();
+      closeMobileNav();
+      scrollto(scrollLink.hash);
+      return;
+    }
+
+    // 5. Project details modal open buttons (.btn-open-modal or .btn-details)
+    const projectBtn = e.target.closest('.btn-open-modal');
+    if (projectBtn) {
+      e.preventDefault();
+      const projectId = projectBtn.getAttribute('data-project');
+      if (projectId) {
+        openProjectModal(projectId);
+      }
+      return;
+    }
+
+    // 6. Project details modal close buttons
+    if (e.target.closest('#modalCloseBtn') || e.target.closest('#modalBackdrop')) {
+      e.preventDefault();
       closeProjectModal();
+      return;
+    }
+
+    // 7. Resume modal trigger buttons (.btn-trigger-resume)
+    const resumeBtn = e.target.closest('.btn-trigger-resume');
+    if (resumeBtn) {
+      e.preventDefault();
+      closeMobileNav();
+      openResumeModal();
+      return;
+    }
+
+    // 8. Copy to clipboard badges (.copy-badge)
+    const copyBtn = e.target.closest('.copy-badge');
+    if (copyBtn) {
+      e.preventDefault();
+      const textToCopy = copyBtn.getAttribute('data-copy');
+      if (textToCopy) {
+        const handleCopySuccess = () => {
+          const originalText = copyBtn.innerText;
+          copyBtn.innerText = 'Copied!';
+          copyBtn.style.background = '#06b6d4';
+          copyBtn.style.color = '#0b0f19';
+          setTimeout(() => {
+            copyBtn.innerText = originalText;
+            copyBtn.style.background = '';
+            copyBtn.style.color = '';
+          }, 2000);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textToCopy).then(handleCopySuccess).catch(() => {
+            fallbackCopy(textToCopy, handleCopySuccess);
+          });
+        } else {
+          fallbackCopy(textToCopy, handleCopySuccess);
+        }
+      }
+      return;
     }
   });
 
-  /**
-   * Copy to Clipboard Handler
-   */
-  on('click', '.copy-badge', function(e) {
-    const textToCopy = this.getAttribute('data-copy');
-    if (textToCopy) {
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        const originalText = this.innerText;
-        this.innerText = 'Copied!';
-        this.style.background = '#06b6d4';
-        this.style.color = '#0b0f19';
-        setTimeout(() => {
-          this.innerText = originalText;
-          this.style.background = '';
-          this.style.color = '';
-        }, 2000);
-      }).catch(err => {
-        console.warn('Clipboard copy failed:', err);
-      });
+  // Keyboard Escape Key Handler
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeMobileNav();
+      closeProjectModal();
+      closeResumeModal();
     }
-  }, true);
+  });
 
   /**
    * Interactive Contact Form with Instant Client Validation & Feedback
