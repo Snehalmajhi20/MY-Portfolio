@@ -594,26 +594,52 @@
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Sending Message...';
+        submitBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Sending Message...';
       }
 
-      // Prepare simulated sending with mailto trigger fallback
-      setTimeout(() => {
-        if (formStatus) {
-          formStatus.className = 'form-status success';
-          formStatus.innerHTML = `<strong>Thank you, ${name}!</strong> Your message has been received. You can also connect directly via <a href="mailto:snehalmajhi20@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}" class="text-decoration-underline text-white">direct email</a> or LinkedIn.`;
-        }
+      // Build form data for FormSubmit.co (works on GitHub Pages - no PHP needed)
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('subject', subject);
+      formData.append('message', message);
+      formData.append('_subject', '[Portfolio Contact] ' + subject);
+      formData.append('_captcha', 'false');
+      formData.append('_template', 'table');
 
+      fetch('https://formsubmit.co/snehalmajhi20@gmail.com', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (response.ok) {
+          if (formStatus) {
+            formStatus.className = 'form-status success';
+            formStatus.innerHTML = `<strong>Thank you, ${name}!</strong> 🎉 Your message has been sent successfully! I'll get back to you soon. You can also reach me via <a href="mailto:snehalmajhi20@gmail.com" class="text-decoration-underline text-white">direct email</a> or LinkedIn.`;
+          }
+          if (submitBtn) {
+            submitBtn.innerHTML = '<i class="bx bx-check-circle"></i> Message Sent!';
+            setTimeout(() => {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = '<i class="bx bx-paper-plane"></i> Send Message';
+            }, 4000);
+          }
+          contactForm.reset();
+        } else {
+          throw new Error('Server error: ' + response.status);
+        }
+      })
+      .catch(error => {
+        if (formStatus) {
+          formStatus.className = 'form-status error';
+          formStatus.innerHTML = `❌ Failed to send message. Please email me directly at <a href="mailto:snehalmajhi20@gmail.com" class="text-decoration-underline text-white">snehalmajhi20@gmail.com</a>`;
+        }
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '<i class="bx bx-check-circle"></i> Message Sent!';
-          setTimeout(() => {
-            submitBtn.innerHTML = '<i class="bx bx-paper-plane"></i> Send Message';
-          }, 4000);
+          submitBtn.innerHTML = '<i class="bx bx-paper-plane"></i> Send Message';
         }
-
-        contactForm.reset();
-      }, 1000);
+        console.error('Form submission error:', error);
+      });
     });
   }
 
